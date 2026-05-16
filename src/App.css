@@ -108,9 +108,6 @@ a {
   position: fixed;
   right: 20px;
 
-  top: 50%;
-  transform: translateY(-50%);
-
   width: 260px;
   max-width: 80vw;
 
