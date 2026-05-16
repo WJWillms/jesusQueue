@@ -95,8 +95,8 @@ a {
 .adminPanel {
   position: fixed;
   right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+
+  top: 16px;
 
   width: 220px;
   max-width: 80vw;

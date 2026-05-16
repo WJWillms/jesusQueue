@@ -71,6 +71,12 @@ function App() {
   };
 
   const clearQueue = async () => {
+    const confirmClear = window.confirm(
+      "Are you sure you want to clear the entire queue? This cannot be undone."
+    );
+
+    if (!confirmClear) return;
+
     queue.forEach((item) => {
       remove(ref(db, `queue/${item.id}`));
     });
@@ -84,100 +90,108 @@ function App() {
   // =====================
   // RENDER
   // =====================
- return (
-  <div className="container">
+  return (
+    <div className="container">
 
-    <h1>Jesus Queue</h1>
+      <h1>Jesus Queue</h1>
 
-    {/* =====================
+      {/* =====================
         ADMIN PANEL (SIDE)
     ===================== */}
-    <div className="adminPanel">
-      <h3>Admin</h3>
+      <div className="adminPanel">
+        <h3>Admin</h3>
 
-      {!isAdmin ? (
-        <>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+        {!isAdmin ? (
+          <>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  if (password === ADMIN_PASSWORD) {
+                    setIsAdmin(true);
+                    localStorage.setItem("isAdmin", "true");
+                  }
+                }
+              }}
+            />
 
-          <button
-            onClick={() => {
-              if (password === ADMIN_PASSWORD) {
-                setIsAdmin(true);
-                localStorage.setItem("isAdmin", "true");
-              }
-            }}
-          >
-            Login
-          </button>
-        </>
-      ) : (
-        <>
-          <button onClick={nextPerson}>Next</button>
-          <button onClick={clearQueue}>Clear</button>
-          <button onClick={logout}>Logout</button>
-        </>
-      )}
-    </div>
+            <button
+              onClick={() => {
+                if (password === ADMIN_PASSWORD) {
+                  setIsAdmin(true);
+                  localStorage.setItem("isAdmin", "true");
+                }
+              }}
+            >
+              Login
+            </button>
+          </>
+        ) : (
+          <>
+            <button onClick={nextPerson}>Next</button>
+            <button onClick={clearQueue}>Clear</button>
+            <button onClick={logout}>Logout</button>
+          </>
+        )}
+      </div>
 
-    {/* =====================
+      {/* =====================
         INPUT FORM (PUBLIC ONLY)
     ===================== */}
-    {!isAdmin && (
-      <div className="form" style={{ marginBottom: 20 }}>
-        <input
-          placeholder="Your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+      {!isAdmin && (
+        <div className="form" style={{ marginBottom: 20 }}>
+          <input
+            placeholder="Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
 
-        <input
-          placeholder="Ticket link (optional)"
-          value={ticket}
-          onChange={(e) => setTicket(e.target.value)}
-        />
+          <input
+            placeholder="Ticket link (optional)"
+            value={ticket}
+            onChange={(e) => setTicket(e.target.value)}
+          />
 
-        <button onClick={addToQueue}>Join Queue</button>
-      </div>
-    )}
+          <button onClick={addToQueue}>Join Queue</button>
+        </div>
+      )}
 
-    {/* =====================
+      {/* =====================
         QUEUE LIST
     ===================== */}
-    <h2>Current Queue</h2>
+      <h2>Current Queue</h2>
 
-    {queue.length === 0 ? (
-      <p>No one in queue</p>
-    ) : (
-      queue.map((item, index) => (
-        <div key={item.id} className="card">
-          <strong>
-            {index + 1}. {item.name}
-          </strong>
+      {queue.length === 0 ? (
+        <p>No one in queue</p>
+      ) : (
+        queue.map((item, index) => (
+          <div key={item.id} className="card">
+            <strong>
+              {index + 1}. {item.name}
+            </strong>
 
-          {item.ticket && (
-            <div>
-              <a href={item.ticket} target="_blank" rel="noreferrer">
-                Ticket
-              </a>
-            </div>
-          )}
+            {item.ticket && (
+              <div>
+                <a href={item.ticket} target="_blank" rel="noreferrer">
+                  Ticket
+                </a>
+              </div>
+            )}
 
-          {isAdmin && (
-            <button onClick={() => removeFromQueue(item.id)}>
-              Remove
-            </button>
-          )}
-        </div>
-      ))
-    )}
+            {isAdmin && (
+              <button onClick={() => removeFromQueue(item.id)}>
+                Remove
+              </button>
+            )}
+          </div>
+        ))
+      )}
 
-  </div>
-);
+    </div>
+  );
 }
 
 export default App;
