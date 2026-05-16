@@ -20,7 +20,7 @@ function App() {
   };
 
   const [password, setPassword] = useState("");
-  const ADMIN_PASSWORD = "help123";
+  const ADMIN_PASSWORD = "Admin123";
 
   // =====================
   // FIREBASE LISTENER
