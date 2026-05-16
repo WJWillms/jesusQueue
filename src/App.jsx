@@ -88,6 +88,21 @@ function App() {
   };
 
   // =====================
+  // Time since added
+  // =====================
+  const getTimeSince = (timestamp) => {
+    const diff = Date.now() - timestamp;
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+
+    if (minutes < 1) return `${seconds}s ago`;
+    if (hours < 1) return `${minutes}m ago`;
+    return `${hours}h ago`;
+  };
+
+  // =====================
   // RENDER
   // =====================
   return (
@@ -168,11 +183,20 @@ function App() {
         <p>No one in queue</p>
       ) : (
         queue.map((item, index) => (
-          <div key={item.id} className="card">
+          <div
+            key={item.id}
+            className={`card ${index === 0 ? "activeCard" : ""}`}
+          >
             <strong>
               {index + 1}. {item.name}
             </strong>
 
+            {/* TIME SINCE ADDED */}
+            <div className="time">
+              {getTimeSince(item.createdAt)}
+            </div>
+
+            {/* TICKET LINK */}
             {item.ticket && (
               <div>
                 <a href={item.ticket} target="_blank" rel="noreferrer">
@@ -181,6 +205,12 @@ function App() {
               </div>
             )}
 
+            {/* OPTIONAL ADMIN REMOVE */}
+            {isAdmin && (
+              <button onClick={() => removeFromQueue(item.id)}>
+                Remove
+              </button>
+            )}
           </div>
         ))
       )}
