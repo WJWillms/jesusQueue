@@ -8,13 +8,18 @@ function App() {
   // STATE
   // =====================
   const [queue, setQueue] = useState([]);
-
   const [name, setName] = useState("");
   const [ticket, setTicket] = useState("");
+  const [isAdmin, setIsAdmin] = useState(() => {
+    return localStorage.getItem("isAdmin") === "true";
+  });
 
-  const [isAdmin, setIsAdmin] = useState(false);
+  const logout = () => {
+    setIsAdmin(false);
+    localStorage.removeItem("isAdmin");
+  };
+
   const [password, setPassword] = useState("");
-
   const ADMIN_PASSWORD = "help123";
 
   // =====================
@@ -82,7 +87,7 @@ function App() {
   return (
     <div className="container">
 
-      <h1>Help Queue</h1>
+      <h1>Jesus Queue</h1>
 
       {/* =====================
           ADMIN LOGIN
@@ -100,11 +105,44 @@ function App() {
             onClick={() => {
               if (password === ADMIN_PASSWORD) {
                 setIsAdmin(true);
+                localStorage.setItem("isAdmin", "true");
               }
             }}
           >
             Login
           </button>
+        </div>
+      )}
+
+      {!isAdmin ? (
+        <div className="adminPanel">
+          <h3>Admin</h3>
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button
+            onClick={() => {
+              if (password === ADMIN_PASSWORD) {
+                setIsAdmin(true);
+                localStorage.setItem("isAdmin", "true");
+              }
+            }}
+          >
+            Login
+          </button>
+        </div>
+      ) : (
+        <div className="adminPanel">
+          <h3>Admin</h3>
+
+          <button onClick={nextPerson}>Next</button>
+          <button onClick={clearQueue}>Clear</button>
+          <button onClick={logout}>Logout</button>
         </div>
       )}
 
@@ -121,21 +159,23 @@ function App() {
       {/* =====================
           INPUT FORM
       ===================== */}
-      <div className="form" style={{ marginBottom: 20 }}>
-        <input
-          placeholder="Your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+      {!isAdmin && (
+        <div className="form" style={{ marginBottom: 20 }}>
+          <input
+            placeholder="Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
 
-        <input
-          placeholder="Ticket link (optional)"
-          value={ticket}
-          onChange={(e) => setTicket(e.target.value)}
-        />
+          <input
+            placeholder="Ticket link (optional)"
+            value={ticket}
+            onChange={(e) => setTicket(e.target.value)}
+          />
 
-        <button onClick={addToQueue}>Join Queue</button>
-      </div>
+          <button onClick={addToQueue}>Join Queue</button>
+        </div>
+      )}
 
       {/* =====================
           QUEUE LIST
