@@ -84,40 +84,19 @@ function App() {
   // =====================
   // RENDER
   // =====================
-  return (
-    <div className="container">
+ return (
+  <div className="container">
 
-      <h1>Jesus Queue</h1>
+    <h1>Jesus Queue</h1>
 
-      {/* =====================
-          ADMIN LOGIN
-      ===================== */}
-      {!isAdmin && (
-        <div className="form" style={{ marginBottom: 20 }}>
-          <input
-            type="password"
-            placeholder="Admin password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <button
-            onClick={() => {
-              if (password === ADMIN_PASSWORD) {
-                setIsAdmin(true);
-                localStorage.setItem("isAdmin", "true");
-              }
-            }}
-          >
-            Login
-          </button>
-        </div>
-      )}
+    {/* =====================
+        ADMIN PANEL (SIDE)
+    ===================== */}
+    <div className="adminPanel">
+      <h3>Admin</h3>
 
       {!isAdmin ? (
-        <div className="adminPanel">
-          <h3>Admin</h3>
-
+        <>
           <input
             type="password"
             placeholder="Password"
@@ -135,81 +114,70 @@ function App() {
           >
             Login
           </button>
-        </div>
+        </>
       ) : (
-        <div className="adminPanel">
-          <h3>Admin</h3>
-
+        <>
           <button onClick={nextPerson}>Next</button>
           <button onClick={clearQueue}>Clear</button>
           <button onClick={logout}>Logout</button>
-        </div>
+        </>
       )}
-
-      {/* =====================
-          ADMIN CONTROLS
-      ===================== */}
-      {isAdmin && (
-        <div style={{ marginBottom: 20 }}>
-          <button onClick={nextPerson}>Next</button>
-          <button onClick={clearQueue}>Clear All</button>
-        </div>
-      )}
-
-      {/* =====================
-          INPUT FORM
-      ===================== */}
-      {!isAdmin && (
-        <div className="form" style={{ marginBottom: 20 }}>
-          <input
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-
-          <input
-            placeholder="Ticket link (optional)"
-            value={ticket}
-            onChange={(e) => setTicket(e.target.value)}
-          />
-
-          <button onClick={addToQueue}>Join Queue</button>
-        </div>
-      )}
-
-      {/* =====================
-          QUEUE LIST
-      ===================== */}
-      <h2>Current Queue</h2>
-
-      {queue.length === 0 ? (
-        <p>No one in queue</p>
-      ) : (
-        queue.map((item, index) => (
-          <div key={item.id} className="card">
-            <strong>
-              {index + 1}. {item.name}
-            </strong>
-
-            {item.ticket && (
-              <div>
-                <a href={item.ticket} target="_blank" rel="noreferrer">
-                  Ticket
-                </a>
-              </div>
-            )}
-
-            {isAdmin && (
-              <button onClick={() => removeFromQueue(item.id)}>
-                Remove
-              </button>
-            )}
-          </div>
-        ))
-      )}
-
     </div>
-  );
+
+    {/* =====================
+        INPUT FORM (PUBLIC ONLY)
+    ===================== */}
+    {!isAdmin && (
+      <div className="form" style={{ marginBottom: 20 }}>
+        <input
+          placeholder="Your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          placeholder="Ticket link (optional)"
+          value={ticket}
+          onChange={(e) => setTicket(e.target.value)}
+        />
+
+        <button onClick={addToQueue}>Join Queue</button>
+      </div>
+    )}
+
+    {/* =====================
+        QUEUE LIST
+    ===================== */}
+    <h2>Current Queue</h2>
+
+    {queue.length === 0 ? (
+      <p>No one in queue</p>
+    ) : (
+      queue.map((item, index) => (
+        <div key={item.id} className="card">
+          <strong>
+            {index + 1}. {item.name}
+          </strong>
+
+          {item.ticket && (
+            <div>
+              <a href={item.ticket} target="_blank" rel="noreferrer">
+                Ticket
+              </a>
+            </div>
+          )}
+
+          {isAdmin && (
+            <button onClick={() => removeFromQueue(item.id)}>
+              Remove
+            </button>
+          )}
+        </div>
+      ))
+    )}
+
+  </div>
+);
 }
 
 export default App;
