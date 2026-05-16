@@ -1,122 +1,175 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from "react";
+import { ref, push, onValue, remove } from "firebase/database";
+import { db } from "./firebase";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  // =====================
+  // STATE
+  // =====================
+  const [queue, setQueue] = useState([]);
 
+  const [name, setName] = useState("");
+  const [ticket, setTicket] = useState("");
+
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [password, setPassword] = useState("");
+
+  const ADMIN_PASSWORD = "help123";
+
+  // =====================
+  // FIREBASE LISTENER
+  // =====================
+  useEffect(() => {
+    const queueRef = ref(db, "queue");
+
+    return onValue(queueRef, (snapshot) => {
+      const data = snapshot.val();
+
+      if (!data) {
+        setQueue([]);
+        return;
+      }
+
+      const formatted = Object.entries(data).map(([id, value]) => ({
+        id,
+        ...value,
+      }));
+
+      formatted.sort((a, b) => a.createdAt - b.createdAt);
+
+      setQueue(formatted);
+    });
+  }, []);
+
+  // =====================
+  // ADD TO QUEUE
+  // =====================
+  const addToQueue = async () => {
+    if (!name.trim()) return;
+
+    await push(ref(db, "queue"), {
+      name: name.trim(),
+      ticket: ticket.trim(),
+      createdAt: Date.now(),
+    });
+
+    setName("");
+    setTicket("");
+  };
+
+  // =====================
+  // ADMIN FUNCTIONS
+  // =====================
+  const removeFromQueue = async (id) => {
+    await remove(ref(db, `queue/${id}`));
+  };
+
+  const clearQueue = async () => {
+    queue.forEach((item) => {
+      remove(ref(db, `queue/${item.id}`));
+    });
+  };
+
+  const nextPerson = async () => {
+    if (queue.length === 0) return;
+    await removeFromQueue(queue[0].id);
+  };
+
+  // =====================
+  // RENDER
+  // =====================
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="container">
 
-      <div className="ticks"></div>
+      <h1>Help Queue</h1>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {/* =====================
+          ADMIN LOGIN
+      ===================== */}
+      {!isAdmin && (
+        <div className="form" style={{ marginBottom: 20 }}>
+          <input
+            type="password"
+            placeholder="Admin password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          <button
+            onClick={() => {
+              if (password === ADMIN_PASSWORD) {
+                setIsAdmin(true);
+              }
+            }}
+          >
+            Login
+          </button>
+        </div>
+      )}
+
+      {/* =====================
+          ADMIN CONTROLS
+      ===================== */}
+      {isAdmin && (
+        <div style={{ marginBottom: 20 }}>
+          <button onClick={nextPerson}>Next</button>
+          <button onClick={clearQueue}>Clear All</button>
+        </div>
+      )}
+
+      {/* =====================
+          INPUT FORM
+      ===================== */}
+      <div className="form" style={{ marginBottom: 20 }}>
+        <input
+          placeholder="Your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          placeholder="Ticket link (optional)"
+          value={ticket}
+          onChange={(e) => setTicket(e.target.value)}
+        />
+
+        <button onClick={addToQueue}>Join Queue</button>
+      </div>
+
+      {/* =====================
+          QUEUE LIST
+      ===================== */}
+      <h2>Current Queue</h2>
+
+      {queue.length === 0 ? (
+        <p>No one in queue</p>
+      ) : (
+        queue.map((item, index) => (
+          <div key={item.id} className="card">
+            <strong>
+              {index + 1}. {item.name}
+            </strong>
+
+            {item.ticket && (
+              <div>
+                <a href={item.ticket} target="_blank" rel="noreferrer">
+                  Ticket
+                </a>
+              </div>
+            )}
+
+            {isAdmin && (
+              <button onClick={() => removeFromQueue(item.id)}>
+                Remove
+              </button>
+            )}
+          </div>
+        ))
+      )}
+
+    </div>
+  );
 }
 
-export default App
+export default App;
