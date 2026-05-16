@@ -205,12 +205,6 @@ function App() {
               </div>
             )}
 
-            {/* OPTIONAL ADMIN REMOVE */}
-            {isAdmin && (
-              <button onClick={() => removeFromQueue(item.id)}>
-                Remove
-              </button>
-            )}
           </div>
         ))
       )}
