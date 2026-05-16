@@ -62,6 +62,16 @@ function App() {
     setName("");
     setTicket("");
   };
+  // =====================
+  // Update time since every 30 sec
+  // =====================
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setQueue((prev) => [...prev]);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // =====================
   // ADMIN FUNCTIONS
