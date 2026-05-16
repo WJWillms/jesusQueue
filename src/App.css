@@ -106,22 +106,23 @@ a {
 
 .adminPanel {
   position: fixed;
-  right: 16px;
+  right: 20px;
 
-  top: 16px;
+  top: 50%;
+  transform: translateY(-50%);
 
-  width: 220px;
+  width: 260px;
   max-width: 80vw;
 
   background: #1e293b;
-  padding: 14px;
+  padding: 16px;
   border-radius: 12px;
 
   display: flex;
   flex-direction: column;
   gap: 10px;
 
-  align-items: stretch;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .adminPanel input {
