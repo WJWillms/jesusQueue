@@ -181,11 +181,6 @@ function App() {
               </div>
             )}
 
-            {isAdmin && (
-              <button onClick={() => removeFromQueue(item.id)}>
-                Remove
-              </button>
-            )}
           </div>
         ))
       )}
