@@ -123,3 +123,27 @@ a {
 .adminPanel button {
   width: 100%;
 }
+
+.leftPanel {
+  flex: 2;
+}
+
+.rightPanel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* THIS is the key change */
+.adminBox {
+  width: 100%;
+  max-width: 300px;
+
+  background: #1e293b;
+  padding: 16px;
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
